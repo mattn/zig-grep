@@ -1,0 +1,9 @@
+id: e6q47gagsfqhze5z120ge00xlgp1th9rro6re03bg901wm4a
+name: grep
+license: MIT
+description: grep
+
+root_dependencies:
+  - type: git
+    path: https://github.com/tiehuis/zig-regex
+    keep: true

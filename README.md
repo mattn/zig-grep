@@ -1,12 +1,18 @@
 # zig-grep
 
-
+Toy implementation of grep in Zig.
 
 ## Usage
 
-## Requirements
+```
+usage: grep [pattern]
+```
 
 ## Installation
+
+```
+$ zig build
+```
 
 ## License
 

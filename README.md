@@ -11,6 +11,7 @@ usage: grep [pattern]
 ## Installation
 
 ```
+$ gyro fetch
 $ zig build
 ```
 

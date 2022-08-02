@@ -13,7 +13,7 @@ fn grep(filename: []const u8, re: *Regex) !void {
     var i: u32 = 1;
     while (try r.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         //std.log.warn("{s}", .{line});
-        if (try re.match(line)) {
+        if (try re.partialMatch(line)) {
             try writer.print("{s}:{}:{s}\n", .{ filename, i, line });
         }
         i += 1;
@@ -29,7 +29,7 @@ pub fn main() anyerror!void {
     var prog = args.next();
     var pattern = args.next();
     if (pattern == null) {
-        std.log.err("usage: {s} [pattern]", .{prog});
+        std.log.err("usage: {s} [pattern]", .{prog.?});
         std.os.exit(1);
     }
 

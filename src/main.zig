@@ -12,9 +12,10 @@ fn grep(filename: []const u8, re: *Regex) !void {
     var writer = std.io.getStdOut().writer();
     var i: u32 = 1;
     while (try r.readUntilDelimiterOrEof(&buf, '\n')) |line| {
-        //std.log.warn("{s}", .{line});
-        if (try re.partialMatch(line)) {
+        if (re.partialMatch(line)) {
             try writer.print("{s}:{}:{s}\n", .{ filename, i, line });
+        } else |err| {
+            std.log.warn("{}", .{err});
         }
         i += 1;
     }
@@ -35,9 +36,8 @@ pub fn main() anyerror!void {
 
     var cwd_buf: [std.os.PATH_MAX]u8 = undefined;
     var cwd = try std.process.getCwd(&cwd_buf);
-    var absolute_path = try std.fs.path.joinZ(allocator, &.{ cwd_buf[0..cwd.len], "." });
 
-    var dir = try std.fs.openIterableDirAbsolute(absolute_path, .{});
+    var dir = try std.fs.openIterableDirAbsolute(cwd, .{});
     var walker = try dir.walk(allocator);
     defer walker.deinit();
 

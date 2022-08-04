@@ -8,16 +8,18 @@ fn grep(filename: []const u8, re: *Regex) !void {
     var freader = std.io.bufferedReader(file.reader());
     var r = freader.reader();
 
-    var buf: [1024]u8 = undefined;
+    var buf: [4096]u8 = undefined;
     var writer = std.io.getStdOut().writer();
     var i: u32 = 1;
-    while (try r.readUntilDelimiterOrEof(&buf, '\n')) |line| {
-        if (re.partialMatch(line)) {
-            try writer.print("{s}:{}:{s}\n", .{ filename, i, line });
-        } else |err| {
-            std.log.warn("{}", .{err});
+    while (true) {
+        var line = r.readUntilDelimiterOrEof(buf[0..buf.len], '\n') catch null;
+        if (line == null) break;
+        if (try re.partialMatch(line.?)) {
+            try writer.print("{s}:{}:{s}\n", .{ filename, i, line.? });
         }
         i += 1;
+    } else |err| {
+        std.log.warn("{}", .{err});
     }
 }
 
@@ -48,6 +50,11 @@ pub fn main() anyerror!void {
         if (entry.kind != std.fs.IterableDir.Entry.Kind.File) continue;
         if (std.mem.startsWith(u8, entry.path, "zig-cache")) continue;
         if (std.mem.startsWith(u8, entry.path, "zig-out")) continue;
+        if (std.mem.endsWith(u8, entry.path, ".o")) continue;
+        if (std.mem.endsWith(u8, entry.path, ".obj")) continue;
+        if (std.mem.endsWith(u8, entry.path, ".png")) continue;
+        if (std.mem.endsWith(u8, entry.path, ".exe")) continue;
+        if (std.mem.endsWith(u8, entry.path, ".lib")) continue;
         try grep(entry.path, &re);
     }
 }
